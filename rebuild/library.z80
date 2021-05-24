@@ -6,32 +6,34 @@
 ;
 ;---------------------------------------
 
-DOS:		EQU	&H5
-D_OPEN:		EQU	&H0F
-D_SETDMA:	EQU	&H1A
-D_READ:		EQU	&H27
-D_WRITE:	EQU	&H26
-D_CREATE:	EQU	&H16
-D_CLOSE:	EQU	&H10
-D_GET_DRIVE:EQU	&H19
+	OUTPUT	binaries\library.bin
 
-GET_INT:	EQU	&H0100
-PUT_INT:	EQU	&H0103
-COLOR_WHITE	EQU	&H0106
-COLOR_BLACK	EQU	&H0109
-SCREEN_ON	EQU	&H010C
-SCREEN_OFF	EQU	&H010F
-SET_SCREEN0	EQU	&H0112
-SET_SCREEN5	EQU	&H0115
-SPRITES_ON	EQU	&H0118
-SPRITES_OFF	EQU	&H011B
-;PUT_SPRITE    EQU     &H011E
-SET_PAGE	EQU	&H0121
-GET_TIME	EQU	&H0124
-PUT_TXT	EQU	&H0127
-PUT_TXT2	EQU	&H012A
-SAVE_ENTRY	EQU	&H012D
-EXIT_ON_ERR	EQU	&H0130
+DOS:		EQU	$5
+D_OPEN:		EQU	$0F
+D_SETDMA:	EQU	$1A
+D_READ:		EQU	$27 
+D_WRITE:	EQU	$26
+D_CREATE:	EQU	$16
+D_CLOSE:	EQU	$10
+D_GET_DRIVE:EQU	$19
+
+GET_INT:	EQU	$0100
+PUT_INT:	EQU	$0103
+COLOR_WHITE	EQU	$0106
+COLOR_BLACK	EQU	$0109
+SCREEN_ON	EQU	$010C
+SCREEN_OFF	EQU	$010F
+SET_SCREEN0	EQU	$0112
+SET_SCREEN5	EQU	$0115
+SPRITES_ON	EQU	$0118
+SPRITES_OFF	EQU	$011B
+;PUT_SPRITE    EQU     $011E
+SET_PAGE	EQU	$0121
+GET_TIME	EQU	$0124
+PUT_TXT		EQU	$0127
+PUT_TXT2	EQU	$012A
+SAVE_ENTRY	EQU	$012D
+EXIT_ON_ERR	EQU	$0130
 
 
 INIT_LIB:	JP	LOAD_DIR	; Laad dir. in mem
@@ -42,12 +44,12 @@ CLOSE_LIB:	JP	CLOSE
 LOAD_FILE:	JP	LOAD_BIN
 
 	RET		; stel dat ??
-	; geen ORG
+	; geen ORG 
 
 
 PUT_NAM_FCB:	;                         ; In:  HL = file name pointer
 	LD	DE,FCB+1
-	LD	BC,&H0B	; Out: A  = drive name (0 = def., 1 =  
+	LD	BC,$0B	; Out: A  = drive name (0 = def., 1 =  
 	LDIR		; Cng: HL,DE BC,AF       
 	XOR	A
 	LD	(FCB),A	;      (DRVNAM) must be valid    
@@ -60,7 +62,7 @@ OPEN:
 	LD	DE,FCB
 	LD	C,D_OPEN
 	CALL	DOS
-	LD	HL,&H01
+	LD	HL,$01
 	LD	(FCB+14),HL	; Record length = 1 byte    
 	DEC	L
 	LD	(FCB+33),HL
@@ -107,9 +109,10 @@ LOAD_BIN:
 	CALL	CLOSE	; ja !! raar he ?!
 	RET
 
-; Laad directory
-; In: HL: Adres filename
-;     DE: Bestemmingsadres directory
+/* Laad directory
+* In: HL: Adres filename
+*    DE: Bestemmingsadres directory
+*/
 
 LOAD_DIR:
 	LD	DE,DIRECTORY
@@ -142,7 +145,6 @@ CALC_LENGTH:
 	JR	NZ,CALC_LENGTH
 
 	CALL	READ	; lees directory struct
-
 	RET
 
 ; Zoek file op in directory en stel record number in
@@ -319,7 +321,6 @@ RELSTACK:
 	POP	BC
 	RET
 
-
 LOG_BUF:	DS	50
 	DB	10
 	DB	13
@@ -368,3 +369,4 @@ SAVE_FCB:
 DIRECTORY:
 	DB	0	; 7 BYTES PER FILE  OF 11+3+2
 	;                        ; NAAM - LENGTE - REC.NUM
+	

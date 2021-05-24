@@ -1,29 +1,31 @@
 ;------------------------------------
 ;               DOME
 ;
-; (c) 1998 PARAGON Productions
+; (c) 1998 /2021 PARAGON Productions
 ;
-;             DOME.COM
-;
+;             
+; loader.z80
+; loads the game and starts it
 ;------------------------------------
+	OUTPUT	binaries\loader.com
 
-	ORG	&H0100
+	ORG	$0100
 ST:
 	JP	START
 
-	DB	&H0D	; type dome.com
+	DB	$0D	; type dome.com
 
-	DB	"DOME (c) 1998 PARAGON Productions",&H0D,&H0A
-	DB	&H1A	; Einde txt
+	DB	"DOME (c) 1998 PARAGON Productions",$0D,$0A
+	DB	$1A	; Einde txt
 
-	ORG	&HC000	; after bios
+	ORG	$C000	; after bios 
 
 START:
 	CALL	INIT_SCR	; SCREEN 0-80  + ROODE BALK  
 	LD	HL,FILE0	; DOME BIOS 
 	LD	A,0	; header 0 
-	LD	BC,&H0EFF	;  ! > 16 Kb 
-	LD	DE,&H0100	; adr 
+	LD	BC,$0EFF	;  ! > 16 Kb 
+	LD	DE,$0100	; adr 
 	CALL	LOAD_FILE
 
 	LD	HL,INT_DOS
@@ -36,53 +38,53 @@ START:
 
 	LD	HL,FILE1
 	LD	A,0
-	LD	BC,&H3FFF
-	LD	DE,&H4000
+	LD	BC,$3FFF
+	LD	DE,$4000
 	CALL	LOAD_FILE
 
-	LD	HL,&H4000	; ADR IN RAM  
+	LD	HL,$4000	; ADR IN RAM  
 	LD	A,0	; PAGE (VRAM IN 64 KB) 
-	LD	DE,&H8000	; DE IN VRAM 
+	LD	DE,$8000	; DE IN VRAM 
 	CALL	POP.UP_START
 
 	LD	HL,FILE2
 	LD	A,0
-	LD	BC,&H3FFF
-	LD	DE,&H4000
+	LD	BC,$3FFF
+	LD	DE,$4000
 	CALL	LOAD_FILE
 
-	LD	HL,&H4000	; ADR IN RAM   
+	LD	HL,$4000	; ADR IN RAM   
 	LD	A,1	; PAGE (VRAM IN 64 KB)  
-	LD	DE,&H0000	; DE IN VRAM  
+	LD	DE,$0000	; DE IN VRAM  
 	CALL	POP.UP_START
 
 	LD	HL,FILE3
 	LD	A,0
-	LD	BC,&H3FFF
-	LD	DE,&H4000
+	LD	BC,$3FFF
+	LD	DE,$4000
 	CALL	LOAD_FILE
 
-	LD	HL,&H4000	; ADR IN RAM   
+	LD	HL,$4000	; ADR IN RAM   
 	LD	A,1	; PAGE (VRAM IN 64 KB)  
-	LD	DE,&H8000	; DE IN VRAM   
+	LD	DE,$8000	; DE IN VRAM   
 	CALL	POP.UP_START
 
 	LD	HL,FILE4	; DOME Engine 
 	LD	A,0	; header 0 
-	LD	BC,&H4FFF	;  ! > 16 Kb 
-	LD	DE,&H3000	; adr 
+	LD	BC,$4FFF	;  ! > 16 Kb 
+	LD	DE,$3000	; adr 
 	CALL	LOAD_FILE
 
 	LD	HL,FILE5	; Tank tabel 
 	LD	A,0
-	LD	BC,&H1FFF
-	LD	DE,&H1000
+	LD	BC,$1FFF
+	LD	DE,$1000
 	CALL	LOAD_FILE
 
 	LD	HL,FILE6	; VELD
 	LD	A,7	; is nog een BIN file
-	LD	BC,&H3FFF
-	LD	DE,&H8000	; van 8000-bfff ???
+	LD	BC,$3FFF
+	LD	DE,$8000	; van 8000-bfff ???
 	CALL	LOAD_FILE
 
 	HALT
@@ -93,13 +95,13 @@ START:
 	LD	HL,COLOR_DOME_GAME	; restore color  
 	CALL	PUT_COLOR
 
-	LD	A,(&HF3E0)	; screen5,2  
-	OR	&B00000010
-	LD	(&HF3E0),A
+	LD	A,($F3E0)	; screen5,2  
+	OR	00000010b
+	LD	($F3E0),A
 	DI
-	OUT	(&H99),A
+	OUT	($99),A
 	LD	A,129	; REG 1   
-	OUT	(&H99),A
+	OUT	($99),A
 	EI
 
 	LD	HL,SPRTAB	; maak sprites  
@@ -109,7 +111,7 @@ START:
 	CALL	PUTBLK
 
 	DI		; >>> ????  
-	CALL	&H3000	; GO GAME !
+	CALL	$3000	; GO GAME !
 
 	DI
 	LD	HL,INT_DOS
@@ -125,32 +127,32 @@ START:
 
 INIT_SCR:
 	LD	A,80	; nog geen BIOS voorhanden
-	LD	(&HF3AE),A
+	LD	($F3AE),A
 	LD	A,0	; SCREEN 0   
-	LD	IY,(&HFCC1)
-	LD	IX,&H5F
-	CALL	&H1C
+	LD	IY,($FCC1)
+	LD	IX,$5F
+	CALL	$1C
 
 	LD	HL,2048
 	LD	B,10
 INIT_SCR_LOOP:
 	LD	A,255
-	LD	IY,(&HFCC1)
-	LD	IX,&H4D
-	CALL	&H1C
+	LD	IY,($FCC1)
+	LD	IX,$4D
+	CALL	$1C
 	INC	HL
 	DJNZ	INIT_SCR_LOOP
 
 	DI
 	LD	A,15*16+8
-	OUT	(&H99),A
+	OUT	($99),A
 	LD	A,128+12
-	OUT	(&H99),A
+	OUT	($99),A
 
 	LD	A,16*5
-	OUT	(&h99),A
+	OUT	($99),A
 	LD	A,128+13
-	OUT	(&h99),A
+	OUT	($99),A
 	EI
 
 	RET
@@ -162,9 +164,9 @@ CHK_MSX:
 	OR	A
 	CALL	Z,PUT_TXT
 
-	LD	HL,&H002D
-	LD	A,(&HFCC1)
-	CALL	&H0C
+	LD	HL,$002D
+	LD	A,($FCC1)
+	CALL	$0C
 
 	LD	HL,TXT_MSX_2
 	CP	1
@@ -228,16 +230,16 @@ POP.DI:	LD	(POPIFF),A	; Interrupt status  (0: DI; -1: EI)
 
 	LD	L,(IX+2)
 	LD	H,(IX+3)	; Source address in [HL]  
-	LD	DE,&H04
+	LD	DE,$04
 	ADD	HL,DE	; Skip 4 bytes (the 2 addresses)  
-	LD	BC,&H1098
+	LD	BC,$1098
 	OTIR		; Write 1st 16 bytes in VRAM  
 
-	LD	E,&H80
+	LD	E,$80
 	EXX
 	LD	L,(IX+4)
 	LD	H,(IX+5)	; Dest. address in [HL]  
-	LD	DE,&H10
+	LD	DE,$10
 	ADD	HL,DE	; Skip 16 bytes  
 POP.00:	LD	A,(POPEND+1)
 	CP	H
@@ -258,14 +260,14 @@ POP.02:	RLC	D
 	EXX
 
 	CALL	POP.WR
-	OUT	(&H98),A	; Write in VRAM  
+	OUT	($98),A	; Write in VRAM  
 	INC	HL
 	JR	POP.00
 ;
 POP.03:	BIT	7,A
 	JR	NZ,POP.04
 	EXX
-	LD	D,&H00
+	LD	D,$00
 	LD	E,A
 	EXX
 	XOR	A
@@ -274,7 +276,7 @@ POP.03:	BIT	7,A
 POP.04:	BIT	6,A
 	JR	NZ,POP.06
 	RES	7,A
-	LD	BC,&H0400
+	LD	BC,$0400
 POP.07:	RLC	E
 	JR	NC,POP.08
 	LD	D,(HL)
@@ -283,19 +285,19 @@ POP.08:	RLC	D
 	RLA
 	RL	C
 	DJNZ	POP.07
-	ADD	A,&H80
+	ADD	A,$80
 	EXX
 	LD	E,A
 	EXX
 	LD	A,C
-	ADC	A,&H00
+	ADC	A,$00
 	EXX
 	LD	D,A
 	EXX
-	LD	A,&H01
+	LD	A,$01
 	JR	POP.05
 ;
-POP.06:	AND	&H3F
+POP.06:	AND	$3F
 	SRL	A
 	EXX
 	LD	D,A
@@ -306,9 +308,9 @@ POP.06:	AND	&H3F
 	EXX
 	LD	E,A
 	EXX
-	LD	A,&H02
+	LD	A,$02
 	JR	NC,POP.09
-	LD	C,&H01
+	LD	C,$01
 	JR	POP.0A
 ;
 POP.05:	LD	C,A
@@ -333,7 +335,7 @@ POP.0C:	RLC	D
 	INC	HL
 POP.0D:	RLC	D
 	JR	NC,POP.09
-	LD	A,&H02
+	LD	A,$02
 POP.0E:	RLC	E
 	JR	NC,POP.0F
 	LD	D,(HL)
@@ -341,10 +343,10 @@ POP.0E:	RLC	E
 POP.0F:	RLC	D
 	JR	NC,POP.10
 	INC	A
-	CP	&H07
+	CP	$07
 	JR	NZ,POP.0E
 POP.10:	LD	B,A
-	LD	A,&H01
+	LD	A,$01
 POP.11:	RLC	E
 	JR	NC,POP.12
 	LD	D,(HL)
@@ -361,7 +363,7 @@ POP.09:	EXX
 	LD	(POPXXX),HL	; write address in (popxxx)  
 	SCF
 	SBC	HL,DE	; read address in [HL]  
-	LD	C,&H98
+	LD	C,$98
 	CALL	POP.13	; Simulate 'LDIR' in VRAM  
 
 	POP	HL
@@ -417,21 +419,21 @@ POP.WR:	PUSH	BC	; Set write address
 	LD	A,(POPPAG)
 	LD	B,A
 	LD	A,H
-	AND	&B11000000
+	AND	11000000b
 	OR	B
 	RLCA
 	RLCA
 	DI
-	OUT	(&H99),A
-	LD	A,&H8E
-	OUT	(&H99),A
+	OUT	($99),A
+	LD	A,$8E
+	OUT	($99),A
 	LD	A,L
 	LD	A,L
-	OUT	(&H99),A
+	OUT	($99),A
 	LD	A,H
-	AND	&H3F
-	OR	&H40
-	OUT	(&H99),A
+	AND	$3F
+	OR	$40
+	OUT	($99),A
 
 	LD	A,(POPIFF)
 	OR	A
@@ -446,20 +448,20 @@ POP.RD:	PUSH	BC	; Set read address
 	LD	A,(POPPAG)
 	LD	B,A
 	LD	A,H
-	AND	&B11000000
+	AND	11000000b
 	OR	B
 	RLCA
 	RLCA
 	DI
-	OUT	(&H99),A
-	LD	A,&H8E
-	OUT	(&H99),A
+	OUT	($99),A
+	LD	A,$8E
+	OUT	($99),A
 	LD	A,L
 	LD	A,L
-	OUT	(&H99),A
+	OUT	($99),A
 	LD	A,H
-	AND	&H3F
-	OUT	(&H99),A
+	AND	$3F
+	OUT	($99),A
 
 	LD	A,(POPIFF)
 	OR	A
@@ -478,26 +480,26 @@ PUTBLK:
 
 	DI		; vdp klaar ?      
 	LD	A,2	; waarde 2 in reg 15      
-	OUT	(&H99),A
-	LD	A,&H8F	; execute      
-	OUT	(&H99),A
+	OUT	($99),A
+	LD	A,$8F	; execute      
+	OUT	($99),A
 	NOP
 	NOP		; wacht op vdp      
 PUTBLK_WAIT:
-	IN	A,(&H99)	;lees status      
+	IN	A,($99)	;lees status      
 	RRA		; is CE nog 1 dan C is loop      
 	JR	C,PUTBLK_WAIT
 
 	XOR	A	; status reg. op 0      
-	OUT	(&H99),A
-	LD	A,&H8F
-	OUT	(&H99),A
+	OUT	($99),A
+	LD	A,$8F
+	OUT	($99),A
 
-	LD	A,&H20	; register 32      
-	OUT	(&H99),A	; als control register      
-	LD	A,&H91	;in reg 17      
-	OUT	(&H99),A
-	LD	BC,&H0F9B	; 15 bytes naar port 9b      
+	LD	A,$20	; register 32      
+	OUT	($99),A	; als control register      
+	LD	A,$91	;in reg 17      
+	OUT	($99),A
+	LD	BC,$0F9B	; 15 bytes naar port 9b      
 	OTIR
 	EI
 
@@ -506,19 +508,19 @@ PUTBLK_WAIT:
 MAK_SPR:
 	DI
 	LD	A,1
-	OUT	(&H99),A
-	LD	A,&H8E
-	OUT	(&H99),A
+	OUT	($99),A
+	LD	A,$8E
+	OUT	($99),A
 	LD	A,255
-	OUT	(&H99),A
-	LD	A,&H37
-	OUT	(&H99),A
+	OUT	($99),A
+	LD	A,$37
+	OUT	($99),A
 	LD	HL,SPRTAB
 
 	LD	B,13
 LOOPIE:
 	PUSH	BC
-	LD	BC,&H2098
+	LD	BC,$2098
 	OTIR
 	POP	BC
 	DJNZ	LOOPIE
@@ -529,11 +531,11 @@ LOOPIE:
 PUT_COLOR
 	DI
 	XOR	A
-	OUT	(&H99),A
+	OUT	($99),A
 	LD	A,16+128
-	OUT	(&H99),A
+	OUT	($99),A
 
-	LD	BC,&H209A
+	LD	BC,$209A
 	OTIR
 	EI
 	RET
@@ -542,14 +544,14 @@ PUT_COLOR
 
 INT_DOS:	DW	0
 
-TXT_GFX_LOAD:	DB	"DOME-init : loading :",&H1D
+TXT_GFX_LOAD:	DB	"DOME-init : loading :",$1D
 
-TXT_PUNT:	DB	".",&H1D
+TXT_PUNT:	DB	".",$1D
 
-TXT_READY:	DB	"READY.",&H0A,&H0D,&H1D
+TXT_READY:	DB	"READY.",$0A,$0D,$1D
 
 TXT_LACH_DOME:DB	"Launching Dome......................"
-	DB	&H0A,&H0D,&H1D
+	DB	$0A,$0D,$1D
 
 SPRTAB:
 	DB	254,130,132,136,144,160,192,0
@@ -557,66 +559,66 @@ SPRTAB:
 	DB	0,0,0,0,0,0,0,0
 	DB	0,0,0,0,0,0,0,0
 
-	DB	&HFF,&H80,&H80,&H80,&H80,&H80,&H80,&H80
-	DB	&H80,&HFF,0,0,0,0,0,0
-	DB	&HC0,&H40,&H40,&H40,&H40,&H40,&H40,&H40
-	DB	&H40,&HC0,0,0,0,0,0,0
+	DB	$FF,$80,$80,$80,$80,$80,$80,$80
+	DB	$80,$FF,0,0,0,0,0,0
+	DB	$C0,$40,$40,$40,$40,$40,$40,$40
+	DB	$40,$C0,0,0,0,0,0,0
 
-	DB	&H20,&H40,&HA0,&H10,&H08,0,0,0
-	DB	0,0,0,&H08,&H10,&HA0,&H40,&H20
-	DB	&H04,&H02,&H05,&H08,&H10,0,0,0
-	DB	0,0,0,&H10,&H08,&H05,&H02,&H04
+	DB	$20,$40,$A0,$10,$08,0,0,0
+	DB	0,0,0,$08,$10,$A0,$40,$20
+	DB	$04,$02,$05,$08,$10,0,0,0
+	DB	0,0,0,$10,$08,$05,$02,$04
 
 	; pijl omhoog     
-	DB	&H01,&H02,&H04,&H08,&H0e,&H02,&H02,&H03
+	DB	$01,$02,$04,$08,$0e,$02,$02,$03
 	DB	0,0,0,0,0,0,0,0
-	DB	&H80,&H40,&H20,&H10,&H70,&H40,&H40,&Hc0
+	DB	$80,$40,$20,$10,$70,$40,$40,$c0
 	DB	0,0,0,0,0,0,0,0
 	; pijl rechts     
-	DB	0,0,0,0,&H18,&H14,&HF2,&H81
-	DB	&H81,&HF2,&H14,&H18,0,0,0,0
+	DB	0,0,0,0,$18,$14,$F2,$81
+	DB	$81,$F2,$14,$18,0,0,0,0
 	DB	0,0,0,0,0,0,0,0
 	DB	0,0,0,0,0,0,0,0
 	; pijl omlaag     
-	DB	&H03,&H02,&H02,&H0E,&H08,&H04,&H02,&H01
+	DB	$03,$02,$02,$0E,$08,$04,$02,$01
 	DB	0,0,0,0,0,0,0,0
-	DB	&HC0,&H40,&H40,&H70,&H10,&H20,&H40,&H80
+	DB	$C0,$40,$40,$70,$10,$20,$40,$80
 	DB	0,0,0,0,0,0,0,0
 	; pijl links     
-	DB	0,0,0,0,&H18,&H24,&H47,&H81
-	DB	&H81,&H47,&H24,&H18,0,0,0,0
+	DB	0,0,0,0,$18,$24,$47,$81
+	DB	$81,$47,$24,$18,0,0,0,0
 	DB	0,0,0,0,0,0,0,0
 	DB	0,0,0,0,0,0,0,0
 	; attack rondje     
-	DB	&H07,&H18,&H20,&H40,&H40,&H80,&H83,&H83
-	DB	&H80,&H40,&H40,&H20,&H18,&H07,0,0
-	DB	&H80,&H60,&H10,&H08,&H08,&H04,&H04,&H04
-	DB	&H04,&H08,&H08,&H10,&H60,&H80,0,0
+	DB	$07,$18,$20,$40,$40,$80,$83,$83
+	DB	$80,$40,$40,$20,$18,$07,0,0
+	DB	$80,$60,$10,$08,$08,$04,$04,$04
+	DB	$04,$08,$08,$10,$60,$80,0,0
 	; build blokje     
-	DB	&H88,&H11,&H22,&H44,&H88,&H11,&H22,&H44
-	DB	&H88,&H11,&H22,&H44,&H88,&H11,&H22,&H44
-	DB	&H88,&H11,&H22,&H44,&H88,&H11,&H22,&H44
-	DB	&H88,&H11,&H22,&H44,&H88,&H11,&H22,&H44
+	DB	$88,$11,$22,$44,$88,$11,$22,$44
+	DB	$88,$11,$22,$44,$88,$11,$22,$44
+	DB	$88,$11,$22,$44,$88,$11,$22,$44
+	DB	$88,$11,$22,$44,$88,$11,$22,$44
 	; multiple select 1     
-	DB	&HF0,&H80,&H80,&H80,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
+	DB	$F0,$80,$80,$80,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
 	; multiple select 2     
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H80,&H80,&H80,&Hf0
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$80,$80,$80,$f0
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
 	; multiple select 3     
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
-	DB	&H0f,&H01,&H01,&H01,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
+	DB	$0f,$01,$01,$01,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
 	; multiple select 4     
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H00,&H00,&H00,&H00
-	DB	&H00,&H00,&H00,&H00,&H01,&H01,&H01,&H0f
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$00,$00,$00,$00
+	DB	$00,$00,$00,$00,$01,$01,$01,$0f
 
 COLOR_DOME_GAME:
 	DB	#00,#00,#62,#04,#52,#03,#50,#02
@@ -627,7 +629,7 @@ COLOR_DOME_GAME:
 COPY_1_0:	DB	0,0,0,1
 	DB	0,0,0,0
 	DB	0,1,212,0
-	DB	0,0,&HD0
+	DB	0,0,$D0
 
 
 POPPAG:	DB	0
@@ -664,41 +666,41 @@ FILE6:
 
 ;============================== TEXT'EN
 
-RET:	DB	&H0A,&H0D,&H1D
-TXT:	DB	"    ",&H0A,&H0D,&H1D
+RET:	DB	$0A,$0D,$1D
+TXT:	DB	"    ",$0A,$0D,$1D
 
 TXT_ERR:	DB	"Please install the specified device before loading "
-	DB	"DOME...PRESS A KEY TO RESUME.",&H0D,&H1D
+	DB	"DOME...PRESS A KEY TO RESUME.",$0D,$1D
 
-TXT_DOME_INIT:DB	"DOME_init : DOME v0.7c ",&H0A,&H0D,&H1D
+TXT_DOME_INIT:DB	"DOME_init : DOME v0.7c ",$0A,$0D,$1D
 
 
 ;===========  MSX_TYPE TXT'S
 
-TXT_MSX_TYPE:	DB	"SYS_init : ",&H1D
-TXT_MSX_1:	DB	"MSX-1 Found.",&H0A,&H0D,&H1D
-TXT_MSX_2:	DB	"MSX-2 Found.",&H0A,&H0D,&H1D
-TXT_MSX_2P:	DB	"MSX-2+ Found.",&H0A,&H0D,&H1D
-TXT_MSX_TR:	DB	"MSX-TURBO-R Found.",&H0A,&H0D,&H1D
-TXT_MSX_ON:	DB	"MSX-3 Found ,let us know it's name.",&H0A,&H0D,&H1D
+TXT_MSX_TYPE:	DB	"SYS_init : ",$1D
+TXT_MSX_1:	DB	"MSX-1 Found.",$0A,$0D,$1D
+TXT_MSX_2:	DB	"MSX-2 Found.",$0A,$0D,$1D
+TXT_MSX_2P:	DB	"MSX-2+ Found.",$0A,$0D,$1D
+TXT_MSX_TR:	DB	"MSX-TURBO-R Found.",$0A,$0D,$1D
+TXT_MSX_ON:	DB	"MSX-3 Found ,let us know it's name.",$0A,$0D,$1D
 
 ;========== MOUSE TXT'S
 
-TXT_MOUSE_SE:	DB	"Mouse_init: Scaning Game Ports...",&H0A,&H0D,&H1D
+TXT_MOUSE_SE:	DB	"Mouse_init: Scaning Game Ports...",$0A,$0D,$1D
 TXT_MOUSE_YES:DB	"            Mouse found on port : "
-TXT_MOUSE_PORT:	DB	" ",&H0A,&H0D,&H1D
-TXT_MOUSE_NO:	DB	"            No mouse found",&H0A,&H0D,&H1D
+TXT_MOUSE_PORT:	DB	" ",$0A,$0D,$1D
+TXT_MOUSE_NO:	DB	"            No mouse found",$0A,$0D,$1D
 TXT_MOUSE_ERR:DB	"You need a mouse connected on port 1 or 2 to "
-	DB	"run DOME.",&H0A,&H0D,&H1D
+	DB	"run DOME.",$0A,$0D,$1D
 
 ;============  DISK ERROR TXT'S
 
 TXT_D_NO_BIN:	DB	"Error : the specified file is corruted..."
-	DB	&H0A,&H0D,&H1D
+	DB	$0A,$0D,$1D
 
 ;===================== EXIT DOME
 
 TXT_THANKS:	DB	"Thanks for playing Dome."
-	DB	&H0A,&H0D,&H1D
+	DB	$0A,$0D,$1D
 
-	INCLUDE	3	; library functions 
+	INCLUDE	rebuild\library.z80
