@@ -22,6 +22,9 @@ The rebuild sources (Using Sjasm and eclipse) are in the rebuild folder.
 
 TODO
 
+## Releases ##
+
+In the folder releases you can find previous build releases.
 
 ### Credits ###
 
